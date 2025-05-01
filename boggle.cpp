@@ -34,7 +34,7 @@ std::vector<std::vector<char> > genBoard(unsigned int n, int seed)
 		board[i].resize(n);
 		for(unsigned  int j=0;j<n;j++)
 		{
-			board[i][j] = letters[(r() % letters.size())];
+			board[i][j] = letters[(r() % letters.size())]; //this is smart mod usage
 		}
 	}
 	return board;
@@ -82,9 +82,9 @@ std::set<std::string> boggle(const std::set<std::string>& dict, const std::set<s
 	{
 		for(unsigned int j=0;j<board.size();j++)
 		{
-			boggleHelper(dict, prefix, board, "", result, i, j, 0, 1);
-			boggleHelper(dict, prefix, board, "", result, i, j, 1, 0);
-			boggleHelper(dict, prefix, board, "", result, i, j, 1, 1);
+			boggleHelper(dict, prefix, board, "", result, i, j, 0, 1); // down
+			boggleHelper(dict, prefix, board, "", result, i, j, 1, 0); // right
+			boggleHelper(dict, prefix, board, "", result, i, j, 1, 1); // down right
 		}
 	}
 	
@@ -94,6 +94,38 @@ std::set<std::string> boggle(const std::set<std::string>& dict, const std::set<s
 bool boggleHelper(const std::set<std::string>& dict, const std::set<std::string>& prefix, const std::vector<std::vector<char> >& board, 
 								   std::string word, std::set<std::string>& result, unsigned int r, unsigned int c, int dr, int dc)
 {
-//add your solution here!
+	//The dr and dc input argument set the search direction.
+	//You will not need to change dr or dc as you search, rather use them to set r and c as you recurse to the next position.
+	//you will need to use this 'bool' boggleHelper return value to help you insert only the longest word found
 
+	//add your solution here!
+
+	//base case
+	if (r + dr > board.size() || c + dc > board.size()) 
+	{
+		//std::cout << "--> OUT OF BOUND: " << word << std::endl;
+		return false; //exit early
+	}
+	else if (prefix.find(word) == prefix.end()) 
+	{
+	//std::cout << "NOT A PREFIX: " << word << std::endl;
+		return false; //exit early
+	}
+	//else std::cout << "--> Found prefix: " << word << std::endl;
+	
+	//std::cout << board[r][c] << std::endl;
+	bool isNextValid = boggleHelper(dict, prefix, board, word + board[r][c], result, r + dr, c + dc, dr, dc);
+
+	if (!isNextValid) 
+	{
+		//std::cout << "--> next is not valid: " << word << std::endl;
+
+		if (dict.find(word + board[r][c]) != dict.end())
+		{
+			
+			result.insert(word + board[r][c]);
+			return true;
+		}
+	}
+	return isNextValid;
 }
